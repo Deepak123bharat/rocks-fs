@@ -1,7 +1,7 @@
 package = "rocksfs"
 version = "1.01.07.06-01"
 source = {
-	url = "https://github.com/Deepak123bharat/rocks.fs",
+	url = "https://github.com/Deepak123bharat/rocks-fs",
 	tag = "1.01.07"
 }
 description = {
@@ -9,7 +9,7 @@ description = {
 	detailed = [[
 		fs is a Lua implementation of filesystem and platform abstractions.
 	]],
-	homepage = "https://github.com/Deepak123bharat/rocks.fs", 
+	homepage = "https://github.com/Deepak123bharat/rocks-fs", 
 	license = "MIT" 
 }
 dependencies = {
