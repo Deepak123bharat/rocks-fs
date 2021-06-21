@@ -1,8 +1,7 @@
 package = "rocksfs"
-version = "1.01.08.06-01"
+version = "dev-1"
 source = {
-	url = "https://github.com/Deepak123bharat/rocks-fs",
-	tag = "1.01.08"
+	url = "git://github.com/Deepak123bharat/rocks-fs",
 }
 description = {
 	summary = "Module for filesystem and platform abstractions.",

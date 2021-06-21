@@ -8,10 +8,6 @@
 local pairs = pairs
 
 local fs = {}
--- To avoid a loop when loading the other fs modules.
-package.loaded["luarocks.fs"] = fs
-
-local cfg = require("core.cfg")
 
 local pack = table.pack or function(...) return { n = select("#", ...), ... } end
 local unpack = table.unpack or unpack
@@ -77,22 +73,9 @@ do
       end
    end
 
-   local function load_platform_fns(patt, inits)
-      local each_platform = cfg.each_platform
+   local function load_platform_fns(plats, patt, inits)
 
-      -- FIXME A quick hack for the experimental Windows build
-      if os.getenv("LUAROCKS_CROSS_COMPILING") then
-         each_platform = function()
-            local i = 0
-            local plats = { "linux", "unix" }
-            return function()
-               i = i + 1
-               return plats[i]
-            end
-         end
-      end
-
-      for platform in each_platform("most-specific-first") do
+      for _, platform in ipairs(plats) do
          local ok, fs_plat = pcall(require, patt:format(platform))
          if ok and fs_plat then
             load_fns(fs_plat, inits)
@@ -100,7 +83,7 @@ do
       end
    end
 
-   function fs.init()
+   function fs.init(plats)
       local inits = {}
 
       if fs.current_dir then
@@ -119,13 +102,13 @@ do
       end
 
       -- Load platform-specific functions
-      load_platform_fns("luarocks.fs.%s", inits)
+      load_platform_fns(plats, "luarocks.fs.%s", inits)
 
       -- Load platform-independent pure-Lua functionality
       load_fns(require("luarocks.fs.lua"), inits)
 
       -- Load platform-specific fallbacks for missing Lua modules
-      load_platform_fns("luarocks.fs.%s.tools", inits)
+      load_platform_fns(plats, "luarocks.fs.%s.tools", inits)
 
       -- Load platform-independent external tool functionality
       load_fns(require("luarocks.fs.tools"), inits)
