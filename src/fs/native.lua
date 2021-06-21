@@ -689,8 +689,12 @@ local redirect_protocols = {
    https = luasec_ok and https,
 }
 
-local function request(url, method, http, loop_control)  -- luacheck: ignore 431
+local function request(url, opts)  -- luacheck: ignore 431
    local result = {}
+
+   local method = opts.method
+   local http = opts.http
+   local loop_control = opts.loop_control
 
    if fs.fs_is_verbose then
       print(method, url)
@@ -746,7 +750,9 @@ local function request(url, method, http, loop_control)  -- luacheck: ignore 431
                return nil, "Redirection loop -- broken URL?"
             end
             loop_control[url] = true
-            return request(location, method, redirect_protocols[protocol], loop_control)
+            opts.http = redirect_protocols[protocol]
+            opts.loop_control = loop_control
+            return request(location, opts)
          else
             return nil, "URL redirected to unsupported protocol - install luasec to get HTTPS support.", "https"
          end
@@ -811,8 +817,10 @@ local function http_request(url, opts)  -- luacheck: ignore 431
                end
             end
          end
-
-         local result, status, headers, err = request(url, "HEAD", http)  -- luacheck: ignore 421
+         opts.method = "HEAD"
+         opts.http = http
+         opts.loop_control = nil
+         local result, status, headers, err = request(url, opts)  -- luacheck: ignore 421
          if not result then
             return fail_with_status(filename, status, headers)
          end
@@ -822,7 +830,10 @@ local function http_request(url, opts)  -- luacheck: ignore 431
          end
       end
    end
-   local result, status, headers, err = request(url, "GET", http)
+   opts.method = "GET"
+   opts.http = http
+   opts.loop_control = nil
+   local result, status, headers, err = request(url, opts)
    if not result then
       if status then
          return fail_with_status(filename, status, headers)
