@@ -142,7 +142,12 @@ end
 -- re-downloading the file.
 -- @return (boolean, string): true and the filename on success,
 -- false and the error message on failure.
-function tools.use_downloader(url, filename, cache)
+function tools.use_downloader(url, opts)
+   
+   local filename = opts.filename
+   local cache = opts.cache
+   local cfg = opts.cfg
+   
    assert(type(url) == "string")
    assert(type(filename) == "string" or not filename)
 
