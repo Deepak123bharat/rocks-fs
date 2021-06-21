@@ -25,6 +25,16 @@ local tar = require("luarocks.tools.tar")
 
 local dir_stack = {}
 
+--- Check if platform is unix
+-- @return boolean: true if LuaRocks is currently running on unix.
+function fs.is_platform_unix() 
+   if package.config:sub(1,1) == "/" then
+      return true
+   else
+      return false
+   end
+end
+
 --- Test is file/dir is writable.
 -- Warning: testing if a file/dir is writable does not guarantee
 -- that it will remain writable and therefore it is no replacement
@@ -381,7 +391,7 @@ local function are_the_same_file(f1, f2)
    if f1 == f2 then
       return true
    end
-   if cfg.is_platform("unix") then
+   if fs.is_platform_unix() then
       local i1 = lfs.attributes(f1, "ino")
       local i2 = lfs.attributes(f2, "ino")
       if i1 ~= nil and i1 == i2 then
