@@ -12,18 +12,13 @@ local util = require("luarocks.util")
 
 local pack = table.pack or function(...) return { n = select("#", ...), ... } end
 
-local socket_ok, zip_ok, lfs_ok, md5_ok, posix_ok, bz2_ok, _
-local http, ftp, zip, lfs, md5, posix, bz2
-
-if cfg.fs_use_modules then
-   socket_ok, http = pcall(require, "socket.http")
-   _, ftp = pcall(require, "socket.ftp")
-   zip_ok, zip = pcall(require, "luarocks.tools.zip")
-   bz2_ok, bz2 = pcall(require, "bz2")
-   lfs_ok, lfs = pcall(require, "lfs")
-   md5_ok, md5 = pcall(require, "md5")
-   posix_ok, posix = pcall(require, "posix")
-end
+local http = require("socket.http")
+local ftp = require("socket.ftp")
+local zip = require("luarocks.tools.zip")
+local bz2 = require("bz2")
+local lfs = require("lfs")
+local md5 = require("md5")
+local posix = require("posix")
 
 local patch = require("luarocks.tools.patch")
 local tar = require("luarocks.tools.tar")
@@ -270,8 +265,6 @@ end
 -- LuaFileSystem functions
 ---------------------------------------------------------------------
 
-if lfs_ok then
-
 --- Run the given command.
 -- The command is executed in the current directory in the dir stack.
 -- @param cmd string: No quoting/escaping is applied to the command.
@@ -432,7 +425,7 @@ function fs_lua.copy(src, dest, perms)
    if not perms then
       fullattrs = lfs.attributes(src, "permissions")
    end
-   if fullattrs and posix_ok then
+   if fullattrs then
       return posix.chmod(dest, fullattrs)
    else
       if not perms then
@@ -627,22 +620,9 @@ function fs_lua.set_time(file, time)
    return lfs.touch(file, time)
 end
 
-else -- if not lfs_ok
-
-function fs_lua.exists(file)
-   assert(file)
-   file = dir.normalize(fs.absolute_name(file))
-   -- check if file exists by attempting to open it
-   return util.exists(file)
-end
-
-end
-
 ---------------------------------------------------------------------
 -- lua-bz2 functions
 ---------------------------------------------------------------------
-
-if bz2_ok then
 
 local function bunzip2_string(data)
    local decompressor = bz2.initDecompress()
@@ -669,13 +649,10 @@ function fs_lua.bunzip2(infile, outfile)
    return fs.filter_file(bunzip2_string, infile, outfile)
 end
 
-end
 
 ---------------------------------------------------------------------
 -- luarocks.tools.zip functions
 ---------------------------------------------------------------------
-
-if zip_ok then
 
 function fs_lua.zip(zipfile, ...)
    return zip.zip(zipfile, ...)
@@ -689,13 +666,10 @@ function fs_lua.gunzip(infile, outfile)
    return zip.gunzip(infile, outfile)
 end
 
-end
 
 ---------------------------------------------------------------------
 -- LuaSocket functions
 ---------------------------------------------------------------------
-
-if socket_ok then
 
 local ltn12 = require("ltn12")
 local luasec_ok, https = pcall(require, "ssl.https")
@@ -924,18 +898,9 @@ function fs_lua.download(url, filename, cache)
    return true, filename, from_cache
 end
 
-else --...if socket_ok == false then
-
-function fs_lua.download(url, filename, cache)
-   return fs.use_downloader(url, filename, cache)
-end
-
-end
 ---------------------------------------------------------------------
 -- MD5 functions
 ---------------------------------------------------------------------
-
-if md5_ok then
 
 -- Support the interface of lmd5 by lhf in addition to md5 by Roberto
 -- and the keplerproject.
@@ -961,7 +926,6 @@ function fs_lua.get_md5(file)
 end
 
 end
-end
 
 ---------------------------------------------------------------------
 -- POSIX functions
@@ -979,7 +943,6 @@ function fs_lua._unix_rwx_to_number(rwx, neg)
    return math.floor(num)
 end
 
-if posix_ok then
 
 local octal_to_rwx = {
    ["0"] = "---",
@@ -1054,13 +1017,12 @@ end
 
 end -- if posix.mkdtemp
 
-end
 
 ---------------------------------------------------------------------
 -- Other functions
 ---------------------------------------------------------------------
 
-if lfs_ok and not fs_lua.make_temp_dir then
+if not fs_lua.make_temp_dir then
 
 function fs_lua.make_temp_dir(name_pattern)
    assert(type(name_pattern) == "string")

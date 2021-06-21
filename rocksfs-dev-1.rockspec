@@ -12,7 +12,12 @@ description = {
 	license = "MIT" 
 }
 dependencies = {
-	"lua >= 5.1",
+	"lua >= 5.1, < 5.4",
+	"luafilesystem",
+	"luasocket",
+	"lmd5",
+	"lua-bz2",
+	"luaposix",
 }
 build = {
 	type = "builtin",
