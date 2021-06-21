@@ -695,7 +695,8 @@ local function request(url, opts)  -- luacheck: ignore 431
    local method = opts.method
    local http = opts.http
    local loop_control = opts.loop_control
-
+   local cfg = opts.cfg
+   
    if fs.fs_is_verbose then
       print(method, url)
    end
