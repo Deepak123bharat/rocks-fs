@@ -692,7 +692,7 @@ local redirect_protocols = {
 local function request(url, method, http, loop_control)  -- luacheck: ignore 431
    local result = {}
 
-   if cfg.verbose then
+   if fs.fs_is_verbose then
       print(method, url)
    end
 
@@ -789,7 +789,11 @@ end
 -- via the HTTP Last-Modified header if the full download is needed.
 -- @return (boolean | (nil, string, string?)): True if successful, or
 -- nil, error message and optionally HTTPS error in case of errors.
-local function http_request(url, filename, http, cache)  -- luacheck: ignore 431
+local function http_request(url, opts)  -- luacheck: ignore 431
+   local filename = opts.filename
+   local http = opts.http
+   local cache = opts.cache
+   local cfg = opts.cfg
    if cache then
       local status = read_timestamp(filename..".status")
       local timestamp = read_timestamp(filename..".timestamp")
@@ -865,7 +869,9 @@ local downloader_warning = false
 -- In case of failure:
 -- * false
 -- * error message
-function fs_lua.download(url, filename, cache)
+function fs_lua.download(url, opts)
+   local filename = opts.filename
+   local cache = opts.cache
    assert(type(url) == "string")
    assert(type(filename) == "string" or not filename)
 
@@ -876,16 +882,19 @@ function fs_lua.download(url, filename, cache)
       return fs.use_downloader(url, filename, cache)
    end
 
+   opts.filename = filename
+   opts.cache = cache
+   opts.http = http
    local ok, err, https_err, from_cache
    if util.starts_with(url, "http:") then
-      ok, err, https_err, from_cache = http_request(url, filename, http, cache)
+      ok, err, https_err, from_cache = http_request(url, opts)
    elseif util.starts_with(url, "ftp:") then
       ok, err = ftp_request(url, filename)
    elseif util.starts_with(url, "https:") then
       -- skip LuaSec when proxy is enabled since it is not supported
       if luasec_ok and not os.getenv("https_proxy") then
          local _
-         ok, err, _, from_cache = http_request(url, filename, https, cache)
+         ok, err, _, from_cache = http_request(url, opts)
       else
          https_err = true
       end
