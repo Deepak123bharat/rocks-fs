@@ -17,6 +17,114 @@ math.randomseed(os.time())
 
 local fs_is_verbose = false
 
+local platform_sets = {
+   freebsd = { unix = true, bsd = true, freebsd = true },
+   openbsd = { unix = true, bsd = true, openbsd = true },
+   solaris = { unix = true, solaris = true },
+   windows = { windows = true, win32 = true },
+   cygwin = { unix = true, cygwin = true },
+   macosx = { unix = true, bsd = true, macosx = true, macos = true },
+   netbsd = { unix = true, bsd = true, netbsd = true },
+   haiku = { unix = true, haiku = true },
+   linux = { unix = true, linux = true },
+   mingw = { windows = true, win32 = true, mingw32 = true, mingw = true },
+   msys = { unix = true, cygwin = true, msys = true },
+   msys2_mingw_w64 = { windows = true, win32 = true, mingw32 = true, mingw = true, msys = true, msys2_mingw_w64 = true },
+}
+
+local function make_platforms(system)
+   -- fallback to Unix in unknown systems
+   return platform_sets[system] or { unix = true }
+end
+
+----------| Start |---------- Defaults fs variables ------------------------------------
+local function make_defaults(platforms)
+   local defaults = {
+      variables = {
+         MD5SUM = "md5sum",
+         OPENSSL = "openssl",
+         MD5 = "md5",
+         
+         WGET = "wget",
+         CURL = "curl",
+         
+         PWD = "pwd",
+         LS = "ls",
+       
+         MKDIR = "mkdir",
+         RMDIR = "rmdir",
+         CP = "cp",
+         RM = "rm",
+         FIND = "find",
+         
+         ZIP = "zip",
+         UNZIP = "unzip -n",
+
+         CHMOD = "chmod",
+         TOUCH = "touch",
+
+         MKTEMP = "mktemp",
+         SEVENZ = "7z",
+         ICACLS = "icacls",
+         
+         WGETNOCERTFLAG = "",
+         CURLNOCERTFLAG = "",
+
+         LUA_BINDIR = "/usr/local/bin",
+      },
+   }
+
+   if platforms.unix then
+      defaults.variables.TEST = "test"
+   end
+
+   return defaults;
+end
+--------- | End | -------- Defaults fs variables End------------------------------------
+
+--------- | Start | ------------ Util functions to add defualts variable to fs ------------------
+--- Merges contents of src below those of dst's contents
+-- (i.e. if an key from src already exists in dst, do not replace it).
+-- @param dst Destination table, which will receive src's contents.
+-- @param src Table which provides new contents to dst.
+local function deep_merge_under(dst, src)
+   for k, v in pairs(src) do
+      if type(v) == "table" then
+         if dst[k] == nil then
+            dst[k] = {}
+         end
+         if type(dst[k]) == "table" then
+            deep_merge_under(dst[k], v)
+         end
+      elseif dst[k] == nil then
+         dst[k] = v
+      end
+   end
+end
+
+local function use_defaults(variables, defaults)
+
+   -- Populate variables with values from their 'defaults' counterparts
+   -- if they were not already set by user.
+   if not variables then
+      variables = {}
+   end
+   for k,v in pairs(defaults.variables) do
+      if not variables[k] then
+         variables[k] = v
+      end
+   end
+
+   deep_merge_under(variables, defaults)
+
+   -- FIXME get rid of this
+   if not variables.check_certificates then
+      variables.variables.CURLNOCERTFLAG = "-k"
+      variables.variables.WGETNOCERTFLAG = "--no-check-certificate"
+   end
+end
+-----------| End |-------- Util functions to add defualts variable to fs ---------------
+
 do
    local old_popen, old_execute
 
@@ -51,6 +159,7 @@ do
    end
 end
 
+
 do
    local function load_fns(fs_table, inits)
       for name, fn in pairs(fs_table) do
@@ -84,8 +193,14 @@ do
       end
    end
 
-   function fs.init(plats)
+   -- | TODO | ---- system detection detection is needed to get system
+   local platforms = make_platforms(system) or { unix = true }
+
+   function fs.init(plats, variables)
       local inits = {}
+
+      local defaults = make_defaults(platforms)
+      use_defaults(variables, defaults)
 
       if fs.current_dir then
          -- unload luarocks fs so it can be reloaded using all modules
