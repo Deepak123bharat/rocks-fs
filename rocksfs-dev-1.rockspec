@@ -1,3 +1,4 @@
+rockspec_format = "3.0"
 package = "rocksfs"
 version = "dev-1"
 source = {
@@ -24,4 +25,19 @@ build = {
 	modules = {
 		rocksfs = "src/fs.lua"
 	}
+}
+test_dependencies = {
+   "luacov",
+   "busted-htest",
+}
+test = {
+   type = "busted",
+   platforms = {
+      windows = {
+         flags = { "--exclude-tags=ssh,git,unix" }
+      },
+      unix = {
+         flags = { "--exclude-tags=ssh,git" }
+      }
+   }
 }
