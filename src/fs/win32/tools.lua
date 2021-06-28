@@ -6,7 +6,6 @@ local tools = {}
 
 local fs = require("luarocks.fs")
 local dir = require("luarocks.dir")
-local cfg = require("luarocks.core.cfg")
 
 local vars = setmetatable({}, { __index = function(_,k) return fs.variables[k] end })
 

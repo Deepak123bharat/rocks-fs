@@ -4,7 +4,6 @@ local unix = {}
 
 local fs = require("luarocks.fs")
 
-local cfg = require("luarocks.core.cfg")
 local dir = require("luarocks.dir")
 local path = require("luarocks.path")
 local util = require("luarocks.util")
