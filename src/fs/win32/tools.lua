@@ -285,10 +285,6 @@ function tools.set_permissions(filename, mode, scope)
    return true
 end
 
-function tools.browser(url)
-   return fs.execute(cfg.web_browser..' "Starting docs..." '..fs.Q(url))
-end
-
 -- Set access and modification times for a file.
 -- @param filename File to set access and modification times for.
 -- @param time may be a string or number containing the format returned
