@@ -1108,48 +1108,6 @@ function fs_lua.move(src, dest, perms)
    return true
 end
 
---- Check if user has write permissions for the command.
--- Assumes the configuration variables under cfg have been previously set up.
--- @param args table: the args table passed to run() drivers.
--- @return boolean or (boolean, string): true on success, false on failure,
--- plus an error message.
-function fs_lua.check_command_permissions(args)
-   local ok = true
-   local err = ""
-   for _, directory in ipairs { cfg.rocks_dir, cfg.deploy_lua_dir, cfg.deploy_bin_dir, cfg.deploy_lua_dir } do
-      if fs.exists(directory) then
-         if not fs.is_writable(directory) then
-            ok = false
-            err = "Your user does not have write permissions in " .. directory
-            break
-         end
-      else
-         local root = fs.root_of(directory)
-         local parent = directory
-         repeat
-            parent = dir.dir_name(parent)
-            if parent == "" then
-               parent = root
-            end
-         until parent == root or fs.exists(parent)
-         if not fs.is_writable(parent) then
-            ok = false
-            err = directory.." does not exist and your user does not have write permissions in " .. parent
-            break
-         end
-      end
-   end
-   if ok then
-      return true
-   else
-      if args["local"] or cfg.local_by_default then
-         err = err .. " \n-- please check your permissions."
-      else
-         err = err .. " \n-- you may want to run as a privileged user or use your local tree with --local."
-      end
-      return nil, err
-   end
-end
 
 --- Check whether a file is a Lua script
 -- When the file can be successfully compiled by the configured
@@ -1158,7 +1116,7 @@ end
 -- @return boolean true, if it is a Lua script, false otherwise
 function fs_lua.is_lua(filename)
   filename = filename:gsub([[%\]],"/")   -- normalize on fw slash to prevent escaping issues
-  local lua = fs.Q(dir.path(cfg.variables["LUA_BINDIR"], cfg.lua_interpreter))  -- get lua interpreter configured
+  local lua = fs.Q(dir.path(fs.variables["LUA_BINDIR"], cfg.lua_interpreter))  -- get lua interpreter configured
   -- execute on configured interpreter, might not be the same as the interpreter LR is run on
   local result = fs.execute_string(lua..[[ -e "if loadfile(']]..filename..[[') then os.exit(0) else os.exit(1) end"]])
   return (result == true)
