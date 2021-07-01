@@ -7,7 +7,6 @@ local fs_lua = {}
 local fs = require("luarocks.fs")
 
 local dir = require("luarocks.dir")
-local util = require("luarocks.util")
 
 local pack = table.pack or function(...) return { n = select("#", ...), ... } end
 
@@ -23,6 +22,11 @@ local patch = require("luarocks.tools.patch")
 local tar = require("luarocks.tools.tar")
 
 local dir_stack = {}
+
+
+local function starts_with(s, prefix)
+   return s:sub(1,#prefix) == prefix
+end
 
 --- Check if platform is unix
 -- @return boolean: true if LuaRocks is currently running on unix.
@@ -136,8 +140,6 @@ function fs_lua.is_tool_available(tool_cmd, tool_name, arg)
 
    if ok then
       return true
-   else
-      return nil, false
    end
 end
 
@@ -862,7 +864,6 @@ local function ftp_request(url, filename)
    return true
 end
 
-local downloader_warning = false
 
 --- Download a remote file.
 -- @param url string: URL to be fetched.
@@ -895,11 +896,11 @@ function fs_lua.download(url, opts)
    opts.cache = cache
    opts.http = http
    local ok, err, https_err, from_cache
-   if util.starts_with(url, "http:") then
+   if starts_with(url, "http:") then
       ok, err, https_err, from_cache = http_request(url, opts)
-   elseif util.starts_with(url, "ftp:") then
+   elseif starts_with(url, "ftp:") then
       ok, err = ftp_request(url, filename)
-   elseif util.starts_with(url, "https:") then
+   elseif starts_with(url, "https:") then
       -- skip LuaSec when proxy is enabled since it is not supported
       if luasec_ok and not os.getenv("https_proxy") then
          local _
@@ -914,10 +915,6 @@ function fs_lua.download(url, opts)
       local downloader, err = fs.which_tool("downloader")
       if not downloader then
          return nil, err
-      end
-      if not downloader_warning then
-         util.warning("falling back to "..downloader.." - install luasec to get native HTTPS support")
-         downloader_warning = true
       end
       return fs.use_downloader(url, filename, cache)
    elseif not ok then
