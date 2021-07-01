@@ -17,28 +17,8 @@ math.randomseed(os.time())
 
 local fs_is_verbose = false
 
-local platform_sets = {
-   freebsd = { unix = true, bsd = true, freebsd = true },
-   openbsd = { unix = true, bsd = true, openbsd = true },
-   solaris = { unix = true, solaris = true },
-   windows = { windows = true, win32 = true },
-   cygwin = { unix = true, cygwin = true },
-   macosx = { unix = true, bsd = true, macosx = true, macos = true },
-   netbsd = { unix = true, bsd = true, netbsd = true },
-   haiku = { unix = true, haiku = true },
-   linux = { unix = true, linux = true },
-   mingw = { windows = true, win32 = true, mingw32 = true, mingw = true },
-   msys = { unix = true, cygwin = true, msys = true },
-   msys2_mingw_w64 = { windows = true, win32 = true, mingw32 = true, mingw = true, msys = true, msys2_mingw_w64 = true },
-}
-
-local function make_platforms(system)
-   -- fallback to Unix in unknown systems
-   return platform_sets[system] or { unix = true }
-end
-
 ----------| Start |---------- Defaults fs variables ------------------------------------
-local function make_defaults(platforms)
+local function make_defaults()
    local defaults = {
       variables = {
          MD5SUM = "md5sum",
@@ -71,12 +51,9 @@ local function make_defaults(platforms)
          CURLNOCERTFLAG = "",
 
          LUA_BINDIR = "/usr/local/bin",
+         TEST = "test",
       },
    }
-
-   if platforms.unix then
-      defaults.variables.TEST = "test"
-   end
 
    return defaults;
 end
@@ -193,13 +170,10 @@ do
       end
    end
 
-   -- | TODO | ---- system detection detection is needed to get system
-   local platforms = make_platforms(system) or { unix = true }
-
    function fs.init(plats, variables)
       local inits = {}
 
-      local defaults = make_defaults(platforms)
+      local defaults = make_defaults()
       use_defaults(variables, defaults)
 
       if fs.current_dir then
