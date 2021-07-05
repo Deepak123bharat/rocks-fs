@@ -192,16 +192,16 @@ do
       end
 
       -- Load platform-specific functions
-      load_platform_fns(plats, "luarocks.fs.%s", inits)
+      load_platform_fns(plats, "rocks.fs.%s", inits)
 
       -- Load platform-independent pure-Lua functionality
-      load_fns(require("luarocks.fs.lua"), inits)
+      load_fns(require("rocks.fs.native"), inits)
 
       -- Load platform-specific fallbacks for missing Lua modules
-      load_platform_fns(plats, "luarocks.fs.%s.tools", inits)
+      load_platform_fns(plats, "rocks.fs.%s.tools", inits)
 
       -- Load platform-independent external tool functionality
-      load_fns(require("luarocks.fs.tools"), inits)
+      load_fns(require("rocks.fs.tools"), inits)
 
       -- Run platform-specific initializations after everything is loaded
       for _, init in ipairs(inits) do
