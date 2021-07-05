@@ -23,7 +23,8 @@ dependencies = {
 build = {
 	type = "builtin",
 	modules = {
-		["rocks.fs"] = "src/rocks/fs.lua"
+		["rocks.fs"] = "src/rocks/fs.lua",
+		["rocks.fun"] = "src/rocks/fun.lua"
 	}
 }
 test_dependencies = {
