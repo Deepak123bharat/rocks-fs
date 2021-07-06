@@ -1,7 +1,7 @@
 --- NetBSD implementation of filesystem and platform abstractions.
 local netbsd = {}
 
-local fs = require("luarocks.fs")
+local fs = require("rocks.fs")
 
 function netbsd.init()
     local uz=io.open("/usr/bin/unzip", "r")

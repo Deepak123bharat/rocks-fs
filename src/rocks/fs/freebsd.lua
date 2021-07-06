@@ -1,7 +1,7 @@
 --- FreeBSD implementation of filesystem and platform abstractions.
 local freebsd = {}
 
-local fs = require("luarocks.fs")
+local fs = require("rocks.fs")
 
 function freebsd.init()
    fs.set_tool_available("zip", true)

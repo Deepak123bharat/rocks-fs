@@ -1,8 +1,8 @@
 --- macOS-specific implementation of filesystem and platform abstractions.
 local macosx = {}
 
-local fs = require("luarocks.fs")
-local dir = require("luarocks.dir")
+local fs = require("rocks.fs")
+local dir = require("rocks.dir")
 
 function macosx.is_dir(file)
    file = fs.absolute_name(file)

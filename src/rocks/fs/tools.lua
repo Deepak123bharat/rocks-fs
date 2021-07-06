@@ -2,8 +2,8 @@
 --- Common fs operations implemented with third-party tools.
 local tools = {}
 
-local fs = require("luarocks.fs")
-local dir = require("luarocks.dir")
+local fs = require("rocks.fs")
+local dir = require("rocks.dir")
 
 local vars = setmetatable({}, { __index = function(_,k) return fs.variables[k] end })
 

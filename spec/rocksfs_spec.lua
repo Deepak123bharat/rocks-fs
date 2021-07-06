@@ -22,7 +22,7 @@ function write_file(pathname, str, finally)
    end
 end
 
-describe("luarocks.fs #unit", function()
+describe("rocks.fs #unit", function()
    local exists_file = function(path)
       local ok, err, code = os.rename(path, path)
       if not ok and code == 13 then

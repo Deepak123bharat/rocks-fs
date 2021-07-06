@@ -18,7 +18,7 @@ local lfs = require("lfs")
 local md5 = require("md5")
 local posix = require("posix")
 
-local patch = require("luarocks.tools.patch")
+local patch = require("rocks.patch")
 local tar = require("rocks.tar")
 
 local dir_stack = {}

@@ -3,9 +3,9 @@
 -- used by this module.
 local win32 = {}
 
-local fs = require("luarocks.fs")
+local fs = require("rocks.fs")
 
-local dir = require("luarocks.dir")
+local dir = require("rocks.dir")
 local path = require("luarocks.path")
 local util = require("luarocks.util")
 
