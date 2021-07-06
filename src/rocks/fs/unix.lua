@@ -2,9 +2,9 @@
 --- Unix implementation of filesystem and platform abstractions.
 local unix = {}
 
-local fs = require("luarocks.fs")
+local fs = require("rocks.fs")
 
-local dir = require("luarocks.dir")
+local dir = require("rocks.dir")
 local path = require("luarocks.path")
 local util = require("luarocks.util")
 

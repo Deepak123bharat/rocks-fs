@@ -202,7 +202,7 @@ do
 
       -- Load platform-independent external tool functionality
       load_fns(require("rocks.fs.tools"), inits)
-
+      
       -- Run platform-specific initializations after everything is loaded
       for _, init in ipairs(inits) do
          init()

@@ -4,22 +4,22 @@
 -- module("luarocks.fs.lua")
 local fs_lua = {}
 
-local fs = require("luarocks.fs")
+local fs = require("rocks.fs")
 
-local dir = require("luarocks.dir")
+local dir = require("rocks.dir")
 
 local pack = table.pack or function(...) return { n = select("#", ...), ... } end
 
 local http = require("socket.http")
 local ftp = require("socket.ftp")
-local zip = require("luarocks.tools.zip")
+local zip = require("rocks.zip")
 local bz2 = require("bz2")
 local lfs = require("lfs")
 local md5 = require("md5")
 local posix = require("posix")
 
 local patch = require("luarocks.tools.patch")
-local tar = require("luarocks.tools.tar")
+local tar = require("rocks.tar")
 
 local dir_stack = {}
 

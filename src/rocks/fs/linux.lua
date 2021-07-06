@@ -1,8 +1,8 @@
 --- Linux-specific implementation of filesystem and platform abstractions.
 local linux = {}
 
-local fs = require("luarocks.fs")
-local dir = require("luarocks.dir")
+local fs = require("rocks.fs")
+local dir = require("rocks.dir")
 
 function linux.is_dir(file)
    file = fs.absolute_name(file)
