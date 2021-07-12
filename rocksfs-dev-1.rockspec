@@ -5,7 +5,7 @@ source = {
 	url = "git://github.com/Deepak123bharat/rocks-fs",
 }
 description = {
-	summary = "Module for filesystem and platform abstractions.",
+	summary = "Module for filesystem and platform abstractions. ",
 	detailed = [[
 		fs is a Lua implementation of filesystem and platform abstractions.
 	]],
