@@ -1,6 +1,8 @@
 local fs = require("rocks.fs")
 local lfs = require("lfs")
 
+local is_win = false --TODO
+
 -- A chdir that works in both full and minimal mode, setting
 -- both the real process current dir and the LuaRocks internal stack in minimal mode
 local function chdir(d)
