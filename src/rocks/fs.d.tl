@@ -54,7 +54,7 @@ local record fs
     -- file or nil to use the source file permissions.
     -- @return boolean or (boolean, string): true on success, false on failure,
     -- plus an error message.
-    move: function(src: string, dest: string, perms: string): boolean | boolean, string
+    move: function(src: string, dest: string, perms: string): boolean , string
 
     export_cmd: function(val: string, var: string): string
 
