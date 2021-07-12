@@ -24,12 +24,6 @@ build = {
 	type = "builtin",
 	modules = {
 		["rocks.fs"] = "src/rocks/fs.lua",
-		["rocks.tar"] = "src/rocks/tar.lua",
-		["rocks.zip"] = "src/rocks/zip.lua",
-
-		["rocks.dir"] = "src/rocks/dir.lua",
-		["rocks.fun"] = "src/rocks/fun.lua",
-		["rocks.patch"] = "src/rocks/patch.lua",
 
 		["rocks.fs.unix.tools"] = "src/rocks/fs/unix/tools.lua",
 		["rocks.fs.win32.tools"] = "src/rocks/fs/win32/tools.lua",
