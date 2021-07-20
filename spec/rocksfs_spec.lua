@@ -1301,7 +1301,8 @@ describe("rocks.fs #unit", function()
       end)
    end)
 
-   describe("fs.download #mock", function()
+   
+   pending("fs.download #mock", function()
       local tmpfile
       local tmpdir
 
