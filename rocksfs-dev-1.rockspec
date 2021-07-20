@@ -1,5 +1,5 @@
 rockspec_format = "3.0"
-package = "rocksfs"
+package = "rocks-fs"
 version = "dev-1"
 source = {
 	url = "git://github.com/Deepak123bharat/rocks-fs",
