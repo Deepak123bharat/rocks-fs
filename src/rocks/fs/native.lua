@@ -658,24 +658,6 @@ function fs_lua.bunzip2(infile, outfile)
    return fs.filter_file(bunzip2_string, infile, outfile)
 end
 
-
----------------------------------------------------------------------
--- luarocks.tools.zip functions
----------------------------------------------------------------------
-
-function fs_lua.zip(zipfile, ...)
-   return zip.zip(zipfile, ...)
-end
-
-function fs_lua.unzip(zipfile)
-   return zip.unzip(zipfile)
-end
-
-function fs_lua.gunzip(infile, outfile)
-   return zip.gunzip(infile, outfile)
-end
-
-
 ---------------------------------------------------------------------
 -- LuaSocket functions
 ---------------------------------------------------------------------
@@ -1084,48 +1066,6 @@ function fs_lua.move(src, dest, perms)
    fs.delete(src)
    if fs.exists(src) then
       return false, "Failed move: could not delete "..src.." after copy."
-   end
-   return true
-end
-
---- Unpack an archive.
--- Extract the contents of an archive, detecting its format by
--- filename extension.
--- @param archive string: Filename of archive.
--- @return boolean or (boolean, string): true on success, false and an error message on failure.
-function fs_lua.unpack_archive(archive)
-   assert(type(archive) == "string")
-
-   local ok, err
-   archive = fs.absolute_name(archive)
-   if archive:match("%.tar%.gz$") then
-      local tar_filename = archive:gsub("%.gz$", "")
-      ok, err = fs.gunzip(archive, tar_filename)
-      if ok then
-         ok, err = tar.untar(tar_filename, ".")
-      end
-   elseif archive:match("%.tgz$") then
-      local tar_filename = archive:gsub("%.tgz$", ".tar")
-      ok, err = fs.gunzip(archive, tar_filename)
-      if ok then
-         ok, err = tar.untar(tar_filename, ".")
-      end
-   elseif archive:match("%.tar%.bz2$") then
-      local tar_filename = archive:gsub("%.bz2$", "")
-      ok, err = fs.bunzip2(archive, tar_filename)
-      if ok then
-         ok, err = tar.untar(tar_filename, ".")
-      end
-   elseif archive:match("%.zip$") then
-      ok, err = fs.unzip(archive)
-   elseif archive:match("%.lua$") or archive:match("%.c$") then
-      -- Ignore .lua and .c files; they don't need to be extracted.
-      return true
-   else
-      return false, "Couldn't extract archive "..archive..": unrecognized filename extension"
-   end
-   if not ok then
-      return false, "Failed extracting "..archive..": "..err
    end
    return true
 end

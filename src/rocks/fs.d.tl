@@ -246,13 +246,6 @@ local record fs
     -- @return string or (nil, string): name of temporary directory or (nil, error message) on failure.
     make_temp_dir: function(name_pattern: string): string, string
 
-    --- Unpack an archive.
-    -- Extract the contents of an archive, detecting its format by
-    -- filename extension.
-    -- @param archive string: Filename of archive.
-    -- @return boolean or (boolean, string): true on success, false and an error message on failure.
-    unpack_archive: function(archive: string): boolean | boolean, string
-
     --- List the contents of a directory.
     -- @param at string or nil: directory to list (will be the current
     -- directory if none is given).
