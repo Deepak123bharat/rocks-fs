@@ -130,31 +130,6 @@ function tools.find(at)
    return result
 end
 
---- Compress files in a .zip archive.
--- @param zipfile string: pathname of .zip archive to be created.
--- @param ... Filenames to be stored in the archive are given as
--- additional arguments.
--- @return boolean: true on success, nil and error message on failure.
-function tools.zip(zipfile, ...)
-   if fs.execute_quiet(vars.SEVENZ.." -aoa a -tzip", zipfile, ...) then
-      return true
-   else
-      return nil, "failed compressing " .. zipfile
-   end
-end
-
---- Uncompress files from a .zip archive.
--- @param zipfile string: pathname of .zip archive to be extracted.
--- @return boolean: true on success, nil and error message on failure.
-function tools.unzip(zipfile)
-   assert(zipfile)
-   if fs.execute_quiet(vars.SEVENZ.." -aoa x", zipfile) then
-      return true
-   else
-      return nil, "failed extracting " .. zipfile
-   end
-end
-
 local function sevenz(default_ext, infile, outfile)
    assert(type(infile) == "string")
    assert(outfile == nil or type(outfile) == "string")
@@ -182,14 +157,6 @@ local function sevenz(default_ext, infile, outfile)
    return true
 end
 
---- Uncompresses a .gz file.
--- @param infile string: pathname of .gz file to be extracted.
--- @param outfile string or nil: pathname of output file to be produced.
--- If not given, name is derived from input file.
--- @return boolean: true on success; nil and error message on failure.
-function tools.gunzip(infile, outfile)
-   return sevenz("gz", infile, outfile)
-end
 
 --- Uncompresses a .bz2 file.
 -- @param infile string: pathname of .bz2 file to be extracted.

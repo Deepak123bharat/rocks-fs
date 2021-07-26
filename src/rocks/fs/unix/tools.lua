@@ -118,39 +118,6 @@ function tools.find(at)
    return result
 end
 
---- Compress files in a .zip archive.
--- @param zipfile string: pathname of .zip archive to be created.
--- @param ... Filenames to be stored in the archive are given as
--- additional arguments.
--- @return boolean: true on success, nil and error message on failure.
-function tools.zip(zipfile, ...)
-   local ok, err = fs.is_tool_available(vars.ZIP, "zip")
-   if not ok then
-      return nil, err
-   end
-   if fs.execute_quiet(vars.ZIP.." -r", zipfile, ...) then
-      return true
-   else
-      return nil, "failed compressing " .. zipfile
-   end
-end
-
---- Uncompress files from a .zip archive.
--- @param zipfile string: pathname of .zip archive to be extracted.
--- @return boolean: true on success, nil and error message on failure.
-function tools.unzip(zipfile)
-   assert(zipfile)
-   local ok, err = fs.is_tool_available(vars.UNZIP, "unzip", "--help")
-   if not ok then
-      return nil, err
-   end
-   if fs.execute_quiet(vars.UNZIP, zipfile) then
-      return true
-   else
-      return nil, "failed extracting " .. zipfile
-   end
-end
-
 local function uncompress(default_ext, program, infile, outfile)
    assert(type(infile) == "string")
    assert(outfile == nil or type(outfile) == "string")
@@ -162,15 +129,6 @@ local function uncompress(default_ext, program, infile, outfile)
    else
       return nil, "failed extracting " .. infile
    end
-end
-
---- Uncompresses a .gz file.
--- @param infile string: pathname of .gz file to be extracted.
--- @param outfile string or nil: pathname of output file to be produced.
--- If not given, name is derived from input file.
--- @return boolean: true on success; nil and error message on failure.
-function tools.gunzip(infile, outfile)
-   return uncompress("gz", "gunzip", infile, outfile)
 end
 
 --- Uncompresses a .bz2 file.

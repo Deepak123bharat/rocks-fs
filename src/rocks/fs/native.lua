@@ -12,7 +12,6 @@ local pack = table.pack or function(...) return { n = select("#", ...), ... } en
 
 local http = require("socket.http")
 local ftp = require("socket.ftp")
-local zip = require("rocks.zip")
 local bz2 = require("bz2")
 local lfs = require("lfs")
 local md5 = require("md5")

@@ -281,11 +281,6 @@ local record fs
     -- otherwise.
     execute: function(command: string, ...: string): boolean
 
-    --- Uncompress files from a .zip archive.
-    -- @param zipfile string: pathname of .zip archive to be extracted.
-    -- @return boolean: true on success, nil and error message on failure.
-    unzip: function(zipfile: string): boolean , string
-
     --- Adds prefix to command to make it run from a directory.
     -- @param directory string: Path to a directory.
     -- @param cmd string: A command-line string.
@@ -298,26 +293,12 @@ local record fs
     -- @return nil
     delete: function(arg: string)
 
-    --- Uncompresses a .gz file.
-    -- @param infile string: pathname of .gz file to be extracted.
-    -- @param outfile string or nil: pathname of output file to be produced.
-    -- If not given, name is derived from input file.
-    -- @return boolean: true on success; nil and error message on failure.
-    gunzip: function(infile: string, outfile: string ): boolean , string
-
     --- Return the root directory for the given path.
     -- In Unix, root is always "/".
     -- In Windows, for "c:\hello", returns "c:\"
     -- @param pathname string: pathname to use.
     -- @return string: The root of the given pathname.
     root_fo: function(pathname: string): string
-
-    --- Compress files in a .zip archive.
-    -- @param zipfile string: pathname of .zip archive to be created.
-    -- @param ... Filenames to be stored in the archive are given as
-    -- additional arguments.
-    -- @return boolean: true on success, nil and error message on failure.
-    zip: function(zipfile: string, ...: string): boolean , string
 
     --******FIX It for windos******--
     -- Set access and modification times for a file.
