@@ -861,11 +861,11 @@ end
 -- * false
 -- * error message
 function fs_lua.download(url, opts)
+   assert(type(opts) == "table")
+   assert(type(url) == "string")
+   
    local filename = opts.filename
    local cache = opts.cache
-   assert(type(url) == "string")
-   assert(type(filename) == "string" or not filename)
-
    filename = fs.absolute_name(filename or dir.base_name(url))
 
    -- delegate to the configured downloader so we don't have to deal with whitelists
