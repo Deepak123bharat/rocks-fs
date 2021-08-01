@@ -99,6 +99,7 @@ local function use_defaults(variables, defaults)
       variables.variables.CURLNOCERTFLAG = "-k"
       variables.variables.WGETNOCERTFLAG = "--no-check-certificate"
    end
+   return variables
 end
 -----------| End |-------- Util functions to add defualts variable to fs ---------------
 
@@ -173,9 +174,6 @@ do
    function fs.init(plats, variables)
       local inits = {}
 
-      local defaults = make_defaults()
-      use_defaults(variables, defaults)
-
       if fs.current_dir then
          -- unload luarocks fs so it can be reloaded using all modules
          -- providing extra functionality in the current package paths
@@ -190,6 +188,9 @@ do
             end
          end
       end
+
+      local defaults = make_defaults()
+      fs.variables = use_defaults(variables, defaults)
 
       -- Load platform-specific functions
       load_platform_fns(plats, "rocks.fs.%s", inits)

@@ -29,7 +29,7 @@ end
 
 --- Check if platform is unix
 -- @return boolean: true if LuaRocks is currently running on unix.
-function fs.is_platform_unix() 
+local function is_platform_unix() 
    if package.config:sub(1,1) == "/" then
       return true
    else
@@ -389,7 +389,7 @@ local function are_the_same_file(f1, f2)
    if f1 == f2 then
       return true
    end
-   if fs.is_platform_unix() then
+   if is_platform_unix() then
       local i1 = lfs.attributes(f1, "ino")
       local i2 = lfs.attributes(f2, "ino")
       if i1 ~= nil and i1 == i2 then
@@ -865,19 +865,18 @@ function fs_lua.download(url, opts)
    assert(type(url) == "string")
    
    local filename = opts.filename
-   local cache = opts.cache
    filename = fs.absolute_name(filename or dir.base_name(url))
+   opts.filename = filename
 
    -- delegate to the configured downloader so we don't have to deal with whitelists
    if os.getenv("no_proxy") then
-      return fs.use_downloader(url, filename, cache)
+      return fs.use_downloader(url, opts)
    end
 
-   opts.filename = filename
-   opts.cache = cache
-   opts.http = http
+   
    local ok, err, https_err, from_cache
    if starts_with(url, "http:") then
+      opts.http = http
       ok, err, https_err, from_cache = http_request(url, opts)
    elseif starts_with(url, "ftp:") then
       ok, err = ftp_request(url, filename)
@@ -885,6 +884,7 @@ function fs_lua.download(url, opts)
       -- skip LuaSec when proxy is enabled since it is not supported
       if luasec_ok and not os.getenv("https_proxy") then
          local _
+         opts.http = https
          ok, err, _, from_cache = http_request(url, opts)
       else
          https_err = true
@@ -897,7 +897,7 @@ function fs_lua.download(url, opts)
       if not downloader then
          return nil, err
       end
-      return fs.use_downloader(url, filename, cache)
+      return fs.use_downloader(url, opts)
    elseif not ok then
       return nil, err
    end

@@ -143,9 +143,11 @@ end
 -- false and the error message on failure.
 function tools.use_downloader(url, opts)
    
+   assert(type(opts) == "table")
    local filename = opts.filename
    local cache = opts.cache
-   local cfg = opts.cfg
+   local connection_timeout = opts.connection_timeout
+   local user_agent = opts.user_agent
    
    assert(type(url) == "string")
    assert(type(filename) == "string" or not filename)
@@ -159,9 +161,9 @@ function tools.use_downloader(url, opts)
 
    local ok = false
    if downloader == "wget" then
-      local wget_cmd = vars.WGET.." "..vars.WGETNOCERTFLAG.." --no-cache --user-agent=\""..cfg.user_agent.." via wget\" --quiet "
-      if cfg.connection_timeout and cfg.connection_timeout > 0 then
-        wget_cmd = wget_cmd .. "--timeout="..tostring(cfg.connection_timeout).." --tries=1 "
+      local wget_cmd = vars.WGET.." "..vars.WGETNOCERTFLAG.." --no-cache --user-agent=\""..user_agent.." via wget\" --quiet "
+      if connection_timeout and connection_timeout > 0 then
+        wget_cmd = wget_cmd .. "--timeout="..tostring(connection_timeout).." --tries=1 "
       end
       if cache then
          -- --timestamping is incompatible with --output-document,
@@ -176,9 +178,9 @@ function tools.use_downloader(url, opts)
          ok = fs.execute_quiet(wget_cmd, url)
       end
    elseif downloader == "curl" then
-      local curl_cmd = vars.CURL.." "..vars.CURLNOCERTFLAG.." -f -L --user-agent \""..cfg.user_agent.." via curl\" "
-      if cfg.connection_timeout and cfg.connection_timeout > 0 then
-        curl_cmd = curl_cmd .. "--connect-timeout "..tostring(cfg.connection_timeout).." "
+      local curl_cmd = vars.CURL.." "..vars.CURLNOCERTFLAG.." -f -L --user-agent \""..user_agent.." via curl\" "
+      if connection_timeout and connection_timeout > 0 then
+        curl_cmd = curl_cmd .. "--connect-timeout "..tostring(connection_timeout).." "
       end
       if cache then
          curl_cmd = curl_cmd .. " -R -z \"" .. filename .. "\" "
