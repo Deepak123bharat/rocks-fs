@@ -20,8 +20,6 @@ dependencies = {
 	"lua-bz2",
 	"luaposix",
 	"rocks-dir",
-	"rocks-patch",
-	"rocks-tar",
 }
 build = {
 	type = "builtin",
