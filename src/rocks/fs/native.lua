@@ -675,7 +675,6 @@ local function request(url, opts)  -- luacheck: ignore 431
    local method = opts.method
    local http = opts.http
    local loop_control = opts.loop_control
-   local cfg = opts.cfg
    
    if fs.fs_is_verbose then
       print(method, url)
@@ -688,12 +687,12 @@ local function request(url, opts)  -- luacheck: ignore 431
       proxy = "http://" .. proxy
    end
 
-   if cfg.show_downloads then
+   if opts.show_downloads then
       io.write(method.." "..url.." ...\n")
    end
    local dots = 0
-   if cfg.connection_timeout and cfg.connection_timeout > 0 then
-      http.TIMEOUT = cfg.connection_timeout
+   if opts.connection_timeout and opts.connection_timeout > 0 then
+      http.TIMEOUT = opts.connection_timeout
    end
    local res, status, headers, err = http.request {
       url = url,
@@ -701,7 +700,7 @@ local function request(url, opts)  -- luacheck: ignore 431
       method = method,
       redirect = false,
       sink = ltn12.sink.table(result),
-      step = cfg.show_downloads and function(...)
+      step = opts.show_downloads and function(...)
          io.write(".")
          io.flush()
          dots = dots + 1
@@ -712,10 +711,10 @@ local function request(url, opts)  -- luacheck: ignore 431
          return ltn12.pump.step(...)
       end,
       headers = {
-         ["user-agent"] = cfg.user_agent.." via LuaSocket"
+         ["user-agent"] = opts.user_agent.." via LuaSocket"
       },
    }
-   if cfg.show_downloads then
+   if opts.show_downloads then
       io.write("\n")
    end
    if not res then
@@ -780,7 +779,7 @@ local function http_request(url, opts)  -- luacheck: ignore 431
    local filename = opts.filename
    local http = opts.http
    local cache = opts.cache
-   local cfg = opts.cfg
+
    if cache then
       local status = read_timestamp(filename..".status")
       local timestamp = read_timestamp(filename..".timestamp")
@@ -789,11 +788,11 @@ local function http_request(url, opts)  -- luacheck: ignore 431
          if tonumber(unixtime) then
             local diff = os.time() - tonumber(unixtime)
             if status then
-               if diff < cfg.cache_fail_timeout then
+               if diff < opts.cache_fail_timeout then
                   return nil, status, {}
                end
             else
-               if diff < cfg.cache_timeout then
+               if diff < opts.cache_timeout then
                   return true, nil, nil, true
                end
             end
