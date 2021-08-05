@@ -12,9 +12,6 @@ before_install:
   - pip install --user cpp-coveralls hererocks
   - hererocks env --$LUA --luarocks latest
   - export PATH="$PWD/env/bin:$PATH"
-  - luarocks install rocks-tar --dev
-  - luarocks install rocks-dir --dev
-  - luarocks install rocks-patch --dev
   - luarocks install tl
 
 install:
