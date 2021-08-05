@@ -1,0 +1,27 @@
+language: c
+
+sudo: false
+
+env:
+  - LUA="lua 5.1"
+  - LUA="lua 5.2"
+  - LUA="lua 5.3"
+  - LUA="luajit 2.1"
+
+before_install:
+  - pip install --user cpp-coveralls hererocks
+  - hererocks env --$LUA --luarocks latest
+  - export PATH="$PWD/env/bin:$PATH"
+  - luarocks install tl
+
+install:
+  - luarocks install rocks-fs --dev
+
+script:
+  - tl check src/rocks/fs.d.tl
+  - luarocks test spec/rocksfs_spec.lua
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
