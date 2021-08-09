@@ -39,7 +39,7 @@ test_script:
 - echo "Type check..."
 - tl check src/rocks/fs.d.tl
 - echo "Testing..."
-- lua spec/rocksfs_spec.lua
+- luarocks test 
 
 after_test:
 # @todo

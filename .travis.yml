@@ -19,7 +19,7 @@ install:
 
 script:
   - tl check src/rocks/fs.d.tl
-  - luarocks test spec/rocksfs_spec.lua
+  - luarocks test
 
 notifications:
   email:
