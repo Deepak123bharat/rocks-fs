@@ -16,7 +16,6 @@ environment:
 # Abuse this section so we can have a matrix with different Compiler versions
 configuration:
   - mingw
-  - vs_32
   - vs_64
 
 install:
