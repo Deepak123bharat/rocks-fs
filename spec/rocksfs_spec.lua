@@ -1445,7 +1445,7 @@ describe("rocks.fs #unit", function()
          local result
          
          result = fs.modules("lib")
-         print("value of fs.modules(lib)", result)
+         print("value of fs.modules(lib)", #result)
          assert.same(#result, 2)
          assert.truthy(result[1] == "module1" or result[2] == "module1")
          assert.truthy(result[1] == "module2" or result[2] == "module2")
