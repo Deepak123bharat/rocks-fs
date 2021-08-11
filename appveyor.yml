@@ -30,7 +30,6 @@ build_script:
 - luarocks make
 
 before_test:
-- luarocks install lmd5 OPENSSL_DIR=/usr/local
 - luarocks install rocks-fs --dev
 - luarocks install tl
 
