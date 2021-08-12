@@ -9,19 +9,44 @@ shallow_clone: true
 environment:
   matrix:
   - LUA: "lua 5.1"
+    TARGET: "mingw"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\bin"
+    
   - LUA: "lua 5.2 --compat none"
-  - LUA: "lua 5.3 --compat none"
-  - LUA: "luajit 2.1"
+    TARGET: "mingw"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\bin"
 
-# Abuse this section so we can have a matrix with different Compiler versions
-configuration:
-  - mingw
-  - vs_64
+  - LUA: "lua 5.3 --compat none"
+    TARGET: "mingw"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\bin"
+
+  - LUA: "luajit 2.1"
+    TARGET: "mingw"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\bin"
+
+  - LUA: "lua 5.1"
+    TARGET: "vs_64"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\lib"
+
+  - LUA: "lua 5.2 --compat none"
+    TARGET: "vs_64"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\lib"
+
+  - LUA: "lua 5.3 --compat none"
+    TARGET: "vs_64"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\lib"
+
+  - LUA: "luajit 2.1"
+    TARGET: "vs_64"
+    OPENSSL_LIBDIR: "c:\\OpenSSL-v111-Win32\\lib"
+  
 
 install:
   - set PATH=%CD%\env\bin;C:\Python27\Scripts;C:\MinGW\bin;%PATH%
   - pip install hererocks
-  - hererocks env --%LUA% --target %configuration% --luarocks latest
+  - hererocks env --%LUA% --target %TARGET% --luarocks latest
+  - luarocks config variables.OPENSSL_INCDIR c:\OpenSSL-v111-Win32\include
+  - luarocks config variables.OPENSSL_LIBDIR %OPENSSL_LIBDIR%
 
 before_build:
 # @todo
