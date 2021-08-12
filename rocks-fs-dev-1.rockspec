@@ -16,7 +16,7 @@ dependencies = {
 	"lua >= 5.1, < 5.5",
 	"luafilesystem",
 	"luasocket",
-	"lmd5",
+	"md5",
 	"lua-bz2",
 	"luaposix",
 	"rocks-dir",
