@@ -1,5 +1,6 @@
 local fs = require("rocks.fs")
 local lfs = require("lfs")
+local sysdetect = require("rocks.sysdetect")
 
 local is_win = false --TODO
 
@@ -77,7 +78,12 @@ describe("rocks.fs #unit", function()
 
 
    setup(function()
-      fs.init({ "linux", "unix"})
+      local sys, arc = sysdetect.detect()
+      if(sys == "linux") then
+         fs.init({sys, "unix"})
+      else
+         fs.init({sys})
+      end
    end)
    
    describe("fs.Q", function()

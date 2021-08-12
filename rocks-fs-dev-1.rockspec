@@ -42,6 +42,7 @@ build = {
 test_dependencies = {
    "luacov",
    "busted-htest",
+   "rocks-sysdetect",
 }
 test = {
    type = "busted",
