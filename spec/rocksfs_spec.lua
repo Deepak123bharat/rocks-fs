@@ -2,7 +2,8 @@ local fs = require("rocks.fs")
 local lfs = require("lfs")
 local sysdetect = require("rocks.sysdetect")
 
-local is_win = false --TODO
+local sys, processor = sysdetect.detect()
+local is_win = sys == "windows"
 
 -- A chdir that works in both full and minimal mode, setting
 -- both the real process current dir and the LuaRocks internal stack in minimal mode
