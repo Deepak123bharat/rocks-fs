@@ -15,7 +15,7 @@ before_install:
   - luarocks install tl
 
 install:
-  - luarocks install rocks-fs --dev
+  - luarocks make --dev
 
 script:
   - tl check src/rocks/fs.d.tl
