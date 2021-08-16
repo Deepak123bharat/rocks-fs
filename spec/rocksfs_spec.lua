@@ -1,6 +1,6 @@
 local fs = require("rocks.fs")
 local lfs = require("lfs")
-local sysdetect = require("rocks-sysdetect")
+local sysdetect = require("rocks.sysdetect")
 
 local is_win = false --TODO
 
