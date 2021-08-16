@@ -60,22 +60,6 @@ function tools.remove_dir_tree_if_empty(directory)
    fs.execute_quiet(vars.RMDIR, directory)
 end
 
---- Copy a file.
--- @param src string: Pathname of source
--- @param dest string: Pathname of destination
--- @return boolean or (boolean, string): true on success, false on failure,
--- plus an error message.
-function tools.copy(src, dest)
-   assert(src and dest)
-   if dest:match("[/\\]$") then dest = dest:sub(1, -2) end
-   local ok = fs.execute(vars.CP, src, dest)
-   if ok then
-      return true
-   else
-      return false, "Failed copying "..src.." to "..dest
-   end
-end
-
 --- Recursively copy the contents of a directory.
 -- @param src string: Pathname of source
 -- @param dest string: Pathname of destination
@@ -155,16 +139,6 @@ local function sevenz(default_ext, infile, outfile)
    end
 
    return true
-end
-
-
---- Uncompresses a .bz2 file.
--- @param infile string: pathname of .bz2 file to be extracted.
--- @param outfile string or nil: pathname of output file to be produced.
--- If not given, name is derived from input file.
--- @return boolean: true on success; nil and error message on failure.
-function tools.bunzip2(infile, outfile)
-   return sevenz("bz2", infile, outfile)
 end
 
 --- Helper function for fs.set_permissions

@@ -13,12 +13,24 @@ description = {
 	license = "MIT" 
 }
 dependencies = {
-	"lua >= 5.1, < 5.5",
-	"luafilesystem",
-	"luasocket",
-	"md5",
-	"luaposix",
-	"rocks-dir",
+	platforms = {
+		unix = {
+			"lua >= 5.1, < 5.5",
+			"luafilesystem",
+			"luasocket",
+			"md5",
+			"luaposix",
+			"rocks-dir",
+		},
+		windows = {
+			"lua >= 5.1, < 5.5",
+			"luafilesystem",
+			"luasocket",
+			"md5",
+			"rocks-dir",
+		},
+	},
+	
 }
 build = {
 	type = "builtin",

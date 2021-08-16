@@ -7,6 +7,8 @@ local fs = require("rocks.fs")
 local dir = require("rocks.dir")
 local path = require("luarocks.path")
 local util = require("luarocks.util")
+local posix = require("posix")
+local lfs = require("lfs")
 
 --- Annotate command string for quiet execution.
 -- @param cmd string: A command-line string.
@@ -106,10 +108,6 @@ function unix.tmpname()
    return os.tmpname()
 end
 
-function unix.current_user()
-   return os.getenv("USER")
-end
-
 function unix.is_superuser()
    return os.getenv("USER") == "root"
 end
@@ -164,4 +162,118 @@ function unix.system_cache_dir()
    return dir.path(fs.system_temp_dir(), "cache")
 end
 
+---------------------------------------------------------------------
+-- POSIX functions
+---------------------------------------------------------------------
+
+function unix._unix_rwx_to_number(rwx, neg)
+   local num = 0
+   neg = neg or false
+   for i = 1, 9 do
+      local c = rwx:sub(10 - i, 10 - i) == "-"
+      if neg == c then
+         num = num + 2^(i-1)
+      end
+   end
+   return math.floor(num)
+end
+
+
+local octal_to_rwx = {
+   ["0"] = "---",
+   ["1"] = "--x",
+   ["2"] = "-w-",
+   ["3"] = "-wx",
+   ["4"] = "r--",
+   ["5"] = "r-x",
+   ["6"] = "rw-",
+   ["7"] = "rwx",
+}
+
+do
+   local umask_cache
+   function unix._unix_umask()
+      if umask_cache then
+         return umask_cache
+      end
+      -- LuaPosix (as of 34.0.4) only returns the umask as rwx
+      local rwx = posix.umask()
+      local num = unix._unix_rwx_to_number(rwx, true)
+      umask_cache = ("%03o"):format(num)
+      return umask_cache
+   end
+end
+
+function unix.set_permissions(filename, mode, scope)
+   local perms
+   if mode == "read" and scope == "user" then
+      perms = fs._unix_moderate_permissions("600")
+   elseif mode == "exec" and scope == "user" then
+      perms = fs._unix_moderate_permissions("700")
+   elseif mode == "read" and scope == "all" then
+      perms = fs._unix_moderate_permissions("644")
+   elseif mode == "exec" and scope == "all" then
+      perms = fs._unix_moderate_permissions("755")
+   else
+      return false, "Invalid permission " .. mode .. " for " .. scope
+   end
+
+   -- LuaPosix (as of 5.1.15) does not support octal notation...
+   local new_perms = {}
+   for c in perms:sub(-3):gmatch(".") do
+      table.insert(new_perms, octal_to_rwx[c])
+   end
+   perms = table.concat(new_perms)
+   local err = posix.chmod(filename, perms)
+   return err == 0
+end
+
+function unix.current_user()
+   return posix.getpwuid(posix.geteuid()).pw_name
+end
+
+-- This call is not available on all systems, see #677
+if posix.mkdtemp then
+
+   --- Create a temporary directory.
+   -- @param name_pattern string: name pattern to use for avoiding conflicts
+   -- when creating temporary directory.
+   -- @return string or (nil, string): name of temporary directory or (nil, error message) on failure.
+   function unix.make_temp_dir(name_pattern)
+      assert(type(name_pattern) == "string")
+      name_pattern = dir.normalize(name_pattern)
+   
+      return posix.mkdtemp(fs.system_temp_dir() .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX")
+   end
+   
+end -- if posix.mkdtemp
+
+function unix.are_the_same_file(f1, f2)
+   if f1 == f2 then
+      return true
+   end
+   
+   local i1 = lfs.attributes(f1, "ino")
+   local i2 = lfs.attributes(f2, "ino")
+   if i1 ~= nil and i1 == i2 then
+      return true
+   end
+   
+   return false
+end
+
+function unix.copy_permissions(src, dest, perms)
+   local fullattrs
+   if not perms then
+      fullattrs = lfs.attributes(src, "permissions")
+   end
+   if fullattrs then
+      return posix.chmod(dest, fullattrs)
+   else
+      if not perms then
+         perms = fullattrs:match("x") and "exec" or "read"
+      end
+      return fs.set_permissions(dest, perms, "all")
+   end
+end
 return unix

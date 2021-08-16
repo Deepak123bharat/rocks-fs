@@ -131,15 +131,6 @@ local function uncompress(default_ext, program, infile, outfile)
    end
 end
 
---- Uncompresses a .bz2 file.
--- @param infile string: pathname of .bz2 file to be extracted.
--- @param outfile string or nil: pathname of output file to be produced.
--- If not given, name is derived from input file.
--- @return boolean: true on success; nil and error message on failure.
-function tools.bunzip2(infile, outfile)
-   return uncompress("bz2", "bunzip2", infile, outfile)
-end
-
 do
    local function rwx_to_octal(rwx)
       return (rwx:match "r" and 4 or 0)

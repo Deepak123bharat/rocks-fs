@@ -1,6 +1,6 @@
 
 --- Native Lua implementation of filesystem and platform abstractions,
--- using LuaFileSystem, LuaSocket, LuaSec, lua-zlib, LuaPosix, MD5.
+-- using LuaFileSystem, LuaSocket, LuaSec, lua-zlib, MD5.
 -- module("luarocks.fs.lua")
 local fs_lua = {}
 
@@ -14,23 +14,12 @@ local http = require("socket.http")
 local ftp = require("socket.ftp")
 local lfs = require("lfs")
 local md5 = require("md5")
-local posix = require("posix")
 
 local dir_stack = {}
 
 
 local function starts_with(s, prefix)
    return s:sub(1,#prefix) == prefix
-end
-
---- Check if platform is unix
--- @return boolean: true if LuaRocks is currently running on unix.
-local function is_platform_unix() 
-   if package.config:sub(1,1) == "/" then
-      return true
-   else
-      return false
-   end
 end
 
 --- Test is file/dir is writable.
@@ -381,18 +370,20 @@ function fs_lua.remove_dir_tree_if_empty(d)
    end
 end
 
-local function are_the_same_file(f1, f2)
+function fs_lua.are_the_same_file(f1, f2)
    if f1 == f2 then
       return true
    end
-   if is_platform_unix() then
-      local i1 = lfs.attributes(f1, "ino")
-      local i2 = lfs.attributes(f2, "ino")
-      if i1 ~= nil and i1 == i2 then
-         return true
-      end
-   end
+   
    return false
+end
+
+function fs_lua.copy_permissions(src, dest, perms)
+   if perms then
+      return fs.set_permissions(dest, perms, "all")
+   else
+      return true
+   end
 end
 
 --- Copy a file.
@@ -410,7 +401,7 @@ function fs_lua.copy(src, dest, perms)
    if destmode == "directory" then
       dest = dir.path(dest, dir.base_name(src))
    end
-   if are_the_same_file(src, dest) then
+   if fs.are_the_same_file(src, dest) then
       return nil, "The source and destination are the same files"
    end
    local src_h, err = io.open(src, "rb")
@@ -424,19 +415,7 @@ function fs_lua.copy(src, dest, perms)
    end
    src_h:close()
    dest_h:close()
-
-   local fullattrs
-   if not perms then
-      fullattrs = lfs.attributes(src, "permissions")
-   end
-   if fullattrs then
-      return posix.chmod(dest, fullattrs)
-   else
-      if not perms then
-         perms = fullattrs:match("x") and "exec" or "read"
-      end
-      return fs.set_permissions(dest, perms, "all")
-   end
+   return fs.copy_permissions(src, dest, perms)
 end
 
 --- Implementation function for recursive copy of directory contents.
@@ -899,96 +878,9 @@ end
 
 end
 
----------------------------------------------------------------------
--- POSIX functions
----------------------------------------------------------------------
-
-function fs_lua._unix_rwx_to_number(rwx, neg)
-   local num = 0
-   neg = neg or false
-   for i = 1, 9 do
-      local c = rwx:sub(10 - i, 10 - i) == "-"
-      if neg == c then
-         num = num + 2^(i-1)
-      end
-   end
-   return math.floor(num)
-end
-
-
-local octal_to_rwx = {
-   ["0"] = "---",
-   ["1"] = "--x",
-   ["2"] = "-w-",
-   ["3"] = "-wx",
-   ["4"] = "r--",
-   ["5"] = "r-x",
-   ["6"] = "rw-",
-   ["7"] = "rwx",
-}
-
-do
-   local umask_cache
-   function fs_lua._unix_umask()
-      if umask_cache then
-         return umask_cache
-      end
-      -- LuaPosix (as of 34.0.4) only returns the umask as rwx
-      local rwx = posix.umask()
-      local num = fs_lua._unix_rwx_to_number(rwx, true)
-      umask_cache = ("%03o"):format(num)
-      return umask_cache
-   end
-end
-
-function fs_lua.set_permissions(filename, mode, scope)
-   local perms
-   if mode == "read" and scope == "user" then
-      perms = fs._unix_moderate_permissions("600")
-   elseif mode == "exec" and scope == "user" then
-      perms = fs._unix_moderate_permissions("700")
-   elseif mode == "read" and scope == "all" then
-      perms = fs._unix_moderate_permissions("644")
-   elseif mode == "exec" and scope == "all" then
-      perms = fs._unix_moderate_permissions("755")
-   else
-      return false, "Invalid permission " .. mode .. " for " .. scope
-   end
-
-   -- LuaPosix (as of 5.1.15) does not support octal notation...
-   local new_perms = {}
-   for c in perms:sub(-3):gmatch(".") do
-      table.insert(new_perms, octal_to_rwx[c])
-   end
-   perms = table.concat(new_perms)
-   local err = posix.chmod(filename, perms)
-   return err == 0
-end
-
-function fs_lua.current_user()
-   return posix.getpwuid(posix.geteuid()).pw_name
-end
-
 function fs_lua.is_superuser()
    return false
 end
-
--- This call is not available on all systems, see #677
-if posix.mkdtemp then
-
---- Create a temporary directory.
--- @param name_pattern string: name pattern to use for avoiding conflicts
--- when creating temporary directory.
--- @return string or (nil, string): name of temporary directory or (nil, error message) on failure.
-function fs_lua.make_temp_dir(name_pattern)
-   assert(type(name_pattern) == "string")
-   name_pattern = dir.normalize(name_pattern)
-
-   return posix.mkdtemp(fs.system_temp_dir() .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX")
-end
-
-end -- if posix.mkdtemp
-
 
 ---------------------------------------------------------------------
 -- Other functions
