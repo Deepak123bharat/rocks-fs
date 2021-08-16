@@ -17,7 +17,6 @@ dependencies = {
 	"luafilesystem",
 	"luasocket",
 	"md5",
-	"lua-bz2",
 	"luaposix",
 	"rocks-dir",
 }

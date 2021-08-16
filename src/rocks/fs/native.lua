@@ -12,7 +12,6 @@ local pack = table.pack or function(...) return { n = select("#", ...), ... } en
 
 local http = require("socket.http")
 local ftp = require("socket.ftp")
-local bz2 = require("bz2")
 local lfs = require("lfs")
 local md5 = require("md5")
 local posix = require("posix")
@@ -623,35 +622,6 @@ function fs_lua.set_time(file, time)
       time = os.time(time)
    end
    return lfs.touch(file, time)
-end
-
----------------------------------------------------------------------
--- lua-bz2 functions
----------------------------------------------------------------------
-
-local function bunzip2_string(data)
-   local decompressor = bz2.initDecompress()
-   local output, err = decompressor:update(data)
-   if not output then
-      return nil, err
-   end
-   decompressor:close()
-   return output
-end
-
---- Uncompresses a .bz2 file.
--- @param infile string: pathname of .bz2 file to be extracted.
--- @param outfile string or nil: pathname of output file to be produced.
--- If not given, name is derived from input file.
--- @return boolean: true on success; nil and error message on failure.
-function fs_lua.bunzip2(infile, outfile)
-   assert(type(infile) == "string")
-   assert(outfile == nil or type(outfile) == "string")
-   if not outfile then
-      outfile = infile:gsub("%.bz2$", "")
-   end
-
-   return fs.filter_file(bunzip2_string, infile, outfile)
 end
 
 ---------------------------------------------------------------------
