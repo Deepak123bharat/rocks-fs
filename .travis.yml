@@ -13,6 +13,7 @@ before_install:
   - hererocks env --$LUA --luarocks latest
   - export PATH="$PWD/env/bin:$PATH"
   - luarocks install tl
+  - luarocks install rocks-sysdetect --dev
 
 install:
   - luarocks make --dev
