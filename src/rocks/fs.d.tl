@@ -195,12 +195,6 @@ local record fs
     -- plus an error message.
     copy: function(src: string, dest: string): boolean | boolean , string
 
-    --- Uncompresses a .bz2 file.
-    -- @param infile string: pathname of .bz2 file to be extracted.
-    -- @param outfile string or nil: pathname of output file to be produced.
-    -- If not given, name is derived from input file.
-    -- @return boolean: true on success; nil and error message on failure.
-    bunzip2: function(infile: string, outfile: string): boolean , string
     
     --- Apply a patch.
     -- @param patchname string: The filename of the patch.

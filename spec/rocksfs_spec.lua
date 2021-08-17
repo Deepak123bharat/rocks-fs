@@ -46,7 +46,7 @@ describe("rocks.fs #unit", function()
 
    local get_tmp_path = function()
       local path = os.tmpname()
-      if "linux" == "windows" and not path:find(":") then
+      if sys == "windows" and not path:find(":") then
          path = os.getenv("TEMP") .. path
       end
       os.remove(path)
