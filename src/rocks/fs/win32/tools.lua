@@ -60,23 +60,6 @@ function tools.remove_dir_tree_if_empty(directory)
    fs.execute_quiet(vars.RMDIR, directory)
 end
 
---- Recursively copy the contents of a directory.
--- @param src string: Pathname of source
--- @param dest string: Pathname of destination
--- @return boolean or (boolean, string): true on success, false on failure,
--- plus an error message.
-function tools.copy_contents(src, dest)
-   assert(src and dest)
-   if not fs.is_dir(src) then
-      return false, src .. " is not a directory"
-   end
-   if fs.make_dir(dest) and fs.execute_quiet(vars.CP, "-dR", src.."\\*.*", dest) then
-      return true
-   else
-      return false, "Failed copying "..src.." to "..dest
-   end
-end
-
 --- Delete a file or a directory and all its contents.
 -- For safety, this only accepts absolute paths.
 -- @param arg string: Pathname of source

@@ -73,19 +73,6 @@ function tools.copy(src, dest, perm)
    end
 end
 
---- Recursively copy the contents of a directory.
--- @param src string: Pathname of source
--- @param dest string: Pathname of destination
--- @return boolean or (boolean, string): true on success, false on failure,
--- plus an error message.
-function tools.copy_contents(src, dest)
-   assert(src and dest)
-   if fs.execute_quiet(vars.CP.." -pPR "..fs.Q(src).."/* "..fs.Q(dest)) then
-      return true
-   else
-      return false, "Failed copying "..src.." to "..dest
-   end
-end
 --- Delete a file or a directory and all its contents.
 -- For safety, this only accepts absolute paths.
 -- @param arg string: Pathname of source
