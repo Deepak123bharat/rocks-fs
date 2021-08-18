@@ -63,7 +63,7 @@ test_script:
 - echo "Type check..."
 - tl check src/rocks/fs.d.tl
 - echo "Testing..."
-- luarocks test 
+- luarocks test -- -o gtest --verbose
 
 after_test:
 # @todo
