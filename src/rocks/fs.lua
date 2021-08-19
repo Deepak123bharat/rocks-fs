@@ -183,7 +183,7 @@ do
             end
          end
          for m, _ in pairs(package.loaded) do
-            if m:match("luarocks%.fs%.") then
+            if m:match("rocks%.fs%.") then
                package.loaded[m] = nil
             end
          end
