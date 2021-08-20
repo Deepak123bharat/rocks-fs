@@ -427,7 +427,6 @@ end
 -- @return boolean or (boolean, string): true on success, false on failure
 local function recursive_copy(src, dest, perms)
    local srcmode = lfs.attributes(src, "mode")
-   print(src, srcmode)
    if srcmode == "file" then
       local ok = fs.copy(src, dest, perms)
       if not ok then return false end
@@ -461,12 +460,10 @@ function fs_lua.copy_contents(src, dest, perms)
    if not fs.is_dir(src) then
       return false, src .. " is not a directory"
    end
-   print(pcall(io.open, src))
    if pcall(lfs.dir, src) == false then
       return false, "Permission denied"
    end
    for file in lfs.dir(src) do
-      print("file "..file)
       if file ~= "." and file ~= ".." then
          local ok = recursive_copy(dir.path(src, file), dest, perms)
          if not ok then
@@ -623,10 +620,6 @@ local function request(url, opts)  -- luacheck: ignore 431
    local method = opts.method
    local http = opts.http
    local loop_control = opts.loop_control
-   
-   if fs.fs_is_verbose then
-      print(method, url)
-   end
 
    local proxy = os.getenv("http_proxy")
    if type(proxy) ~= "string" then proxy = nil end
