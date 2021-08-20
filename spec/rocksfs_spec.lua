@@ -79,30 +79,16 @@ describe("rocks.fs #unit", function()
 
 
    local platform_sets = {
-      freebsd = { unix = true, bsd = true, freebsd = true },
-      openbsd = { unix = true, bsd = true, openbsd = true },
-      solaris = { unix = true, solaris = true },
-      windows = { windows = true, win32 = true },
-      cygwin = { unix = true, cygwin = true },
-      macosx = { unix = true, bsd = true, macosx = true, macos = true },
-      netbsd = { unix = true, bsd = true, netbsd = true },
-      haiku = { unix = true, haiku = true },
-      linux = { unix = true, linux = true },
-      mingw = { windows = true, win32 = true, mingw32 = true, mingw = true },
-      msys = { unix = true, cygwin = true, msys = true },
-      msys2_mingw_w64 = { windows = true, win32 = true, mingw32 = true, mingw = true, msys = true, msys2_mingw_w64 = true },
+      linux = { "linux", "unix" },
+      freebsd = { "freebsd", "unix" },
+      netbsd = { "netbsd", "unix" },
+      macosx = { "macosx", "unix" },
+      windows = { "win32" },
    }
    
    setup(function ()
-      local plats = {}
       local sys, _ = sysdetect.detect()
-      if platform_sets[sys] then
-         for platforms, _ in pairs(platform_sets[sys]) do
-               plats[#plats+1] = platforms
-         end
-      end
-       
-      fs.init(plats)
+      fs.init(platform_sets[sys] or { "unix" })
    end)
    
    describe("fs.Q", function()
