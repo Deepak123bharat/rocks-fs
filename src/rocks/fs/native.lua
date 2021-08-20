@@ -460,9 +460,11 @@ function fs_lua.copy_contents(src, dest, perms)
    if not fs.is_dir(src) then
       return false, src .. " is not a directory"
    end
-   if pcall(lfs.dir, src) == false then
+   local pok, iter_fn, iter_obj = pcall(lfs.dir, src)  
+   if pok == false then
       return false, "Permission denied"
    end
+   print("test: iter function", iter_fn(iter_obj))
    for file in lfs.dir(src) do
       if file ~= "." and file ~= ".." then
          local ok = recursive_copy(dir.path(src, file), dest, perms)
