@@ -6,8 +6,6 @@ local win32 = {}
 local fs = require("rocks.fs")
 
 local dir = require("rocks.dir")
-local path = require("luarocks.path")
-local util = require("luarocks.util")
 
 -- Monkey patch io.popen and os.execute to make sure quoting
 -- works as expected.
