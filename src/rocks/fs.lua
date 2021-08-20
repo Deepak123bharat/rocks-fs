@@ -165,6 +165,9 @@ do
 
       for _, platform in ipairs(plats) do
          local ok, fs_plat = pcall(require, patt:format(platform))
+         print("valuses inside load_platform_fns")
+         print(patt:format(platform))
+         print(ok, fs_plat)
          if ok and fs_plat then
             load_fns(fs_plat, inits)
          end
