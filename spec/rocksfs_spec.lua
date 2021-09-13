@@ -1143,6 +1143,102 @@ describe("rocks.fs #unit", function()
       end)
    end)
 
+   describe("fs.copy_dir", function()
+      local srcfile
+      local dstfile
+      local srcintdir
+      local dstintdir
+      local srcdir
+      local dstdir
+
+      after_each(function()
+         if srcfile then
+            os.remove(srcfile)
+            srcfile = nil
+         end
+         if dstfile then
+            os.remove(dstfile)
+            dstfile = nil
+         end
+         if srcintdir then
+            lfs.rmdir(srcintdir)
+            srcintdir = nil
+         end
+         if dstintdir then
+            lfs.rmdir(dstintdir)
+            dstintdir = nil
+         end
+         if srcdir then
+            lfs.rmdir(srcdir)
+            srcdir = nil
+         end
+         if dstdir then
+            lfs.rmdir(dstdir)
+            dstdir = nil
+         end
+      end)
+
+      local create_dir_tree = function()
+         srcdir = get_tmp_path()
+         lfs.mkdir(srcdir)
+         srcintdir = srcdir .. "/internaldir"
+         lfs.mkdir(srcintdir)
+         srcfile = srcintdir .. "/internalfile"
+         create_file(srcfile)
+         dstdir = get_tmp_path()
+      end
+
+      it("returns true and copies the contents (with their permissions) of the source dir to the destination dir", function()
+         create_dir_tree()
+         assert.truthy(fs.copy_dir(srcdir, dstdir))
+         assert.truthy(exists_file(dstdir))
+         dstintdir = dstdir .. "/internaldir"
+         assert.truthy(exists_file(dstintdir))
+         dstfile = dstdir .. "/internaldir/internalfile"
+         local fd = assert(io.open(dstfile, "r"))
+         local dstfilecontent = fd:read("*a")
+         assert.same("foo", dstfilecontent)
+         if posix_ok then
+            assert.same(lfs.attributes(srcfile, "permissions"), lfs.attributes(dstfile, "permissions"))
+         end
+      end)
+
+      it("returns true and copies the contents of the source dir to the destination dir with custom permissions", function()
+         create_dir_tree()
+         assert.truthy(fs.copy_dir(srcdir, dstdir, "read"))
+         assert.truthy(exists_file(dstdir))
+         dstintdir = dstdir .. "/internaldir"
+         assert.truthy(exists_file(dstintdir))
+         dstfile = dstdir .. "/internaldir/internalfile"
+         local fd = assert(io.open(dstfile, "r"))
+         local dstfilecontent = fd:read("*a")
+         assert.same("foo", dstfilecontent)
+      end)
+
+      it("returns false and does nothing if the source dir doesn't exist", function()
+         srcdir = get_tmp_path()
+         dstdir = get_tmp_path()
+         assert.falsy(fs.copy_dir(srcdir, dstdir))
+         assert.falsy(exists_file(dstdir))
+      end)
+
+      it("returns false if the source argument is a file", function()
+         srcdir = get_tmp_path()
+         create_file(srcdir)
+         dstdir = get_tmp_path()
+         assert.falsy(fs.copy_contents(srcdir, dstdir))
+         assert.falsy(exists_file(dstdir))
+      end)
+
+      it("returns false and does nothing if the source dir doesn't have the proper permissions", function()
+         create_dir_tree()
+         make_unreadable(srcdir)
+         assert.falsy(fs.copy_contents(srcdir, dstdir))
+         assert.falsy(exists_file(dstdir .. "/internaldir"))
+         assert.falsy(exists_file(dstdir .. "/internalfile"))
+      end)
+   end)
+
    describe("fs.find", function()
       local tmpdir
       local intdir

@@ -498,6 +498,27 @@ function fs_lua.copy_contents(src, dest, perms)
    return true
 end
 
+--- Copy a directory and its contents to a new directory.
+-- @param src string: Pathname of source
+-- @param dest string: Pathname of destination
+-- @param perms string ("read" or "exec") or nil: Optional permissions.
+-- @return boolean or (boolean, string): true on success, false on failure,
+-- plus an error message.
+function fs_lua.copy_dir(src, dest, perms)
+   assert(src and dest)
+   src = dir.normalize(src)
+   dest = dir.normalize(dest)
+   if not fs.is_dir(src) then
+      return false, src .. " is not a directory"
+   end
+
+   local ok, err = fs.make_dir(dest)
+   if not ok then
+      return nil, err
+   end
+   return fs.copy_contents(src, dest, perms)
+end
+
 --- Implementation function for recursive removal of directories.
 -- Assumes paths are normalized.
 -- @param name string: Pathname of file
