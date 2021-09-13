@@ -794,6 +794,51 @@ describe("rocks.fs #unit", function()
       end)
    end)
 
+   describe("fs.remove_dir", function()
+      local tmpfile
+      local tmpdir
+      local intdir
+
+      after_each(function()
+         if tmpfile then
+            os.remove(tmpfile)
+            tmpfile = nil
+         end
+         if intdir then
+            lfs.rmdir(intdir)
+            intdir = nil
+         end
+         if tmpdir then
+            lfs.rmdir(tmpdir)
+            tmpdir = nil
+         end
+      end)
+
+      it("returns true and deletes the directory specified by the argument", function()
+         tmpdir = get_tmp_path()
+         for _, d in ipairs({tmpdir, tmpdir .. "/sub1", tmpdir .. "/sub1/sub2"}) do
+            lfs.mkdir(d)
+            assert.truthy(lfs.attributes(d))
+         end
+         assert.truthy(fs.remove_dir(tmpdir))
+         assert.falsy(lfs.attributes(tmpdir))
+      end)
+
+      it("returns false and does nothing if the argument is not a directory", function()
+         tmpfile = get_tmp_path()
+         local fd = assert(io.open(tmpfile, "w"))
+         assert(fd:write("foo"))
+         fd:close()
+         assert.falsy(fs.remove_dir(tmpfile))
+         assert.truthy(lfs.attributes(tmpfile))
+      end)
+
+      it("returns false and does nothing if the argument doesn't exist", function()
+         tmpfile = get_tmp_path()
+         assert.falsy(fs.remove_dir(tmpfile))
+      end)
+   end)
+
    describe("fs.remove_dir_if_empty", function()
       local tmpfile
       local tmpdir

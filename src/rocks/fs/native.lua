@@ -347,6 +347,29 @@ function fs_lua.make_dir(directory)
    return true
 end
 
+--- Remove directory recursively
+-- @param path string: directory path to delete
+function fs_lua.remove_dir(path)
+   local attr, err = lfs.attributes(path, "mode")
+   if attr ~= "directory" then
+      return nil, err
+   end
+
+   for file in lfs.dir(path) do
+      if file ~= "." and file ~= ".." then
+         local full_path = path..'/'..file
+
+         if lfs.attributes(full_path, "mode") == "directory" then
+            fs_lua.remove_dir(full_path)
+         else
+            os.remove(full_path)
+         end
+      end
+   end
+
+   return lfs.rmdir(path)
+end
+
 --- Remove a directory if it is empty.
 -- Does not return errors (for example, if directory is not empty or
 -- if already does not exist)
