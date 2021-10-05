@@ -347,6 +347,29 @@ function fs_lua.make_dir(directory)
    return true
 end
 
+--- Remove directory recursively
+-- @param path string: directory path to delete
+function fs_lua.remove_dir(path)
+   local attr, err = lfs.attributes(path, "mode")
+   if attr ~= "directory" then
+      return nil, err
+   end
+
+   for file in lfs.dir(path) do
+      if file ~= "." and file ~= ".." then
+         local full_path = path..'/'..file
+
+         if lfs.attributes(full_path, "mode") == "directory" then
+            fs_lua.remove_dir(full_path)
+         else
+            os.remove(full_path)
+         end
+      end
+   end
+
+   return lfs.rmdir(path)
+end
+
 --- Remove a directory if it is empty.
 -- Does not return errors (for example, if directory is not empty or
 -- if already does not exist)
@@ -481,6 +504,27 @@ function fs_lua.copy_contents(src, dest, perms)
       end
    end
    return true
+end
+
+--- Copy a directory and its contents to a new directory.
+-- @param src string: Pathname of source
+-- @param dest string: Pathname of destination
+-- @param perms string ("read" or "exec") or nil: Optional permissions.
+-- @return boolean or (boolean, string): true on success, false on failure,
+-- plus an error message.
+function fs_lua.copy_dir(src, dest, perms)
+   assert(src and dest)
+   src = dir.normalize(src)
+   dest = dir.normalize(dest)
+   if not fs.is_dir(src) then
+      return false, src .. " is not a directory"
+   end
+
+   local ok, err = fs.make_dir(dest)
+   if not ok then
+      return nil, err
+   end
+   return fs.copy_contents(src, dest, perms)
 end
 
 --- Implementation function for recursive removal of directories.
